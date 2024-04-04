@@ -96,6 +96,7 @@ target_compile_options(oxen-logging-warnings INTERFACE "$<$<OR:$<COMPILE_LANGUAG
 target_link_libraries(oxen-logging INTERFACE oxen-logging-warnings)
 
 if(OXEN_LOGGING_SOURCE_ROOT)
+    list(REMOVE_DUPLICATES OXEN_LOGGING_SOURCE_ROOT)
     set(paths)
     foreach(path ${OXEN_LOGGING_SOURCE_ROOT})
         string(REGEX REPLACE "([\\\"])" "\\\\\\1" path_escaped "${path}")
