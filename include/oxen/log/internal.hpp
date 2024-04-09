@@ -1,26 +1,35 @@
 #pragma once
 
-#if (defined(__GNUC__) && __GNUC__ >= 11) || (defined(__clang__) && __clang_major__ >= 15)
-#include <source_location>
-#else
-#include <experimental/source_location>
-#define USING_EXPERIMENTAL_SRCLOC
-#endif
-
 #include <array>
+#include <memory>
+#include <version>
 #include <spdlog/spdlog.h>
 #include "type.hpp"
 #include "level.hpp"
 
-using source_location =
-#ifdef USING_EXPERIMENTAL_SRCLOC
-        std::experimental::source_location;
+#ifdef __cpp_lib_source_location
+
+#include <source_location>
+namespace oxen::log {
+using source_location = std::source_location;
+}
+
+#elif __has_include(<experimental/source_location>)
+
+#include <experimental/source_location>
+#ifdef __cpp_lib_experimental_source_location
+namespace oxen::log {
+using source_location = std::experimental::source_location;
+}
 #else
-        std::source_location;
+#error "Unable to find a working <source_location> or <experimental/source_location>"
+#endif
+
+#else
+#error "This compiler and/or stdlib does not support <source_location>"
 #endif
 
 namespace oxen::log {
-
 using logger_ptr = std::shared_ptr<spdlog::logger>;
 }
 
