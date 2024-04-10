@@ -2,10 +2,13 @@
 
 #include <array>
 #include <memory>
-#include <version>
 #include <spdlog/spdlog.h>
 #include "type.hpp"
 #include "level.hpp"
+
+#if __has_include(<version>)
+#include <version>
+#endif
 
 #ifdef __cpp_lib_source_location
 
