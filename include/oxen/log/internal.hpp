@@ -57,13 +57,13 @@ inline constexpr std::array<std::string_view, OXEN_LOGGING_SOURCE_ROOTS_LEN> sou
 inline auto spdlog_sloc(const source_location& loc) {
     std::string_view filename{loc.file_name()};
     for (const auto& prefix : source_prefixes) {
-        if (filename.substr(0, prefix.size()) == prefix) {
+        if (filename.starts_with(prefix)) {
             filename.remove_prefix(prefix.size());
             if (!filename.empty() && filename[0] == '/')
                 filename.remove_prefix(1);
         }
     }
-    while (filename.substr(0, 3) == "../")
+    while (filename.starts_with("../"))
         filename.remove_prefix(3);
 
     return spdlog::source_loc{filename.data(), static_cast<int>(loc.line()), loc.function_name()};
