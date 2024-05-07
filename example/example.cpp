@@ -1,8 +1,15 @@
 #include <oxen/log.hpp>
 #include <fmt/color.h>
+#include <fmt/core.h>
+
+#include <oxen/log/formatted_callback_sink.hpp>
 
 int main() {
     using namespace oxen::log;
+
+    oxen::log::add_sink(std::make_shared<formatted_callback_sink>(
+            [](std::string_view msg) {
+                fmt::print("got a log callback: {}\n", msg); }));
 
     add_sink(oxen::log::Type::Print, "stdout");
     add_sink(oxen::log::Type::File, "foo.log");
