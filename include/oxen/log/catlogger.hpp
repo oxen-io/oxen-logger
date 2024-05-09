@@ -1,7 +1,6 @@
 #pragma once
 
 #include <atomic>
-#include <optional>
 #include <string>
 #include <functional>
 
@@ -17,7 +16,6 @@ namespace oxen::log {
 struct CategoryLogger {
   private:
     std::atomic<bool> have_logger = false;
-    std::optional<Level> deferred_level;
     logger_ptr logger;
 
     void find_or_make_logger();
