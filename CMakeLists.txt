@@ -7,7 +7,6 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15 CACHE STRING "macOS deployment target (App
 project(oxen-logging VERSION 1.0.3 LANGUAGES CXX)
 
 option(OXEN_LOGGING_WARNINGS_AS_ERRORS "treat all warnings as errors. turn off for development, on for release" OFF)
-set(OXEN_LOGGING_SOURCE_ROOT "" CACHE PATH "Base path(s) to strip from log message filenames; separate multiple paths with \";\"")
 option(OXEN_LOGGING_FORCE_SUBMODULES "Force use of the bundled fmt/spdlog rather than looking for system packages" OFF)
 option(OXEN_LOGGING_RELEASE_TRACE "Enable trace logging in release builds" OFF)
 option(OXEN_LOGGING_FMT_HEADER_ONLY "Use fmt in header-only mode" OFF)
@@ -95,23 +94,29 @@ add_library(oxen-logging-warnings INTERFACE)
 target_compile_options(oxen-logging-warnings INTERFACE "$<$<OR:$<COMPILE_LANGUAGE:CXX>,$<COMPILE_LANGUAGE:C>>:${warning_flags}>")
 target_link_libraries(oxen-logging INTERFACE oxen-logging-warnings)
 
-if(OXEN_LOGGING_SOURCE_ROOT)
-    list(REMOVE_DUPLICATES OXEN_LOGGING_SOURCE_ROOT)
-    set(paths)
-    foreach(path ${OXEN_LOGGING_SOURCE_ROOT})
-        string(REGEX REPLACE "([\\\"])" "\\\\\\1" path_escaped "${path}")
-        list(APPEND paths "\"${path_escaped}\"")
-        message(STATUS "Stripping source root ${path} (${path_escaped}) from log paths")
+set(oxen_logging_source_roots)
+target_compile_definitions(oxen-logging PUBLIC OXEN_LOGGING_SOURCE_ROOTS= OXEN_LOGGING_SOURCE_ROOTS_LEN=0)
+
+# Append a source path to the source roots to be stripped from log statements
+function(oxen_logging_add_source_dir path)
+    string(REGEX REPLACE "([\\\"])" "\\\\\\1" path_escaped "${path}")
+    list(APPEND oxen_logging_source_roots "\"${path_escaped}\"")
+    list(REMOVE_DUPLICATES oxen_logging_source_roots)
+    set(oxen_logging_source_roots "${oxen_logging_source_roots}" PARENT_SCOPE)
+
+    foreach(prop_c_d COMPILE_DEFINITIONS INTERFACE_COMPILE_DEFINITIONS)
+        get_target_property(roots oxen-logging ${prop_c_d})
+        list(FILTER roots EXCLUDE REGEX "^OXEN_LOGGING_SOURCE_ROOTS")
+        set_target_properties(oxen-logging PROPERTIES ${prop_c_d} "${root}")
     endforeach()
-    list(LENGTH paths pathlen)
-    list(JOIN paths ", " paths)
+    list(LENGTH oxen_logging_source_roots pathlen)
+    list(JOIN oxen_logging_source_roots ", " paths)
     target_compile_definitions(oxen-logging PUBLIC
         OXEN_LOGGING_SOURCE_ROOTS=${paths}
         OXEN_LOGGING_SOURCE_ROOTS_LEN=${pathlen}
     )
-else()
-    message(STATUS "Source root log path stripping disabled")
-endif()
+    message(STATUS "Stripping source root ${path} from oxen-logging paths")
+endfunction()
 
 if (OXEN_LOGGING_RELEASE_TRACE)
     target_compile_definitions(oxen-logging PUBLIC OXEN_LOGGING_RELEASE_TRACE)
