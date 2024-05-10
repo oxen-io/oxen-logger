@@ -50,7 +50,7 @@ bool is_ansicolor_sink(const spdlog::sink_ptr& sink);
 
 inline constexpr std::array<std::string_view, OXEN_LOGGING_SOURCE_ROOTS_LEN> source_prefixes = {
 #ifdef OXEN_LOGGING_SOURCE_ROOTS
-        OXEN_LOGGING_SOURCE_ROOTS,
+        OXEN_LOGGING_SOURCE_ROOTS
 #endif
 };
 
