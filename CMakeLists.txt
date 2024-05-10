@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13...3.23)
+cmake_minimum_required(VERSION 3.15...3.23)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -94,15 +94,17 @@ add_library(oxen-logging-warnings INTERFACE)
 target_compile_options(oxen-logging-warnings INTERFACE "$<$<OR:$<COMPILE_LANGUAGE:CXX>,$<COMPILE_LANGUAGE:C>>:${warning_flags}>")
 target_link_libraries(oxen-logging INTERFACE oxen-logging-warnings)
 
-set(oxen_logging_source_roots)
+set(oxen_logging_source_roots "" CACHE INTERNAL "")
 target_compile_definitions(oxen-logging PUBLIC OXEN_LOGGING_SOURCE_ROOTS= OXEN_LOGGING_SOURCE_ROOTS_LEN=0)
 
-# Append a source path to the source roots to be stripped from log statements
+# Prepend a source path to the source roots to be stripped from log statements.  The given path is
+# added *first* in the list of paths, and any existing duplicates are removed (so calling it
+# multiple times will not add it multiple times, but *will* shift it to the front of the list).
 function(oxen_logging_add_source_dir path)
     string(REGEX REPLACE "([\\\"])" "\\\\\\1" path_escaped "${path}")
-    list(APPEND oxen_logging_source_roots "\"${path_escaped}\"")
+    list(PREPEND oxen_logging_source_roots "\"${path_escaped}\"")
     list(REMOVE_DUPLICATES oxen_logging_source_roots)
-    set(oxen_logging_source_roots "${oxen_logging_source_roots}" PARENT_SCOPE)
+    set(oxen_logging_source_roots "${oxen_logging_source_roots}" CACHE INTERNAL "" FORCE)
 
     foreach(prop_c_d COMPILE_DEFINITIONS INTERFACE_COMPILE_DEFINITIONS)
         get_target_property(roots oxen-logging ${prop_c_d})
