@@ -4,8 +4,12 @@
 
 namespace oxen::log {
 
-std::shared_ptr<spdlog::sinks::dist_sink_mt> master_sink =
-        std::make_shared<spdlog::sinks::dist_sink_mt>();
+inline auto get_master_sink() {
+    static auto ms = std::make_shared<spdlog::sinks::dist_sink_mt>();
+    return ms;
+}
+
+std::shared_ptr<spdlog::sinks::dist_sink_mt> master_sink = get_master_sink();
 
 static std::unordered_map<std::string, logger_ptr> loggers_;
 static std::mutex loggers_mutex_;
