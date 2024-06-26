@@ -194,6 +194,31 @@ struct critical {
     }
 };
 
+template <typename... T>
+struct log {
+    log(const logger_ptr& cat_logger,
+        Level level,
+        fmt::format_string<T...> fmt,
+        T&&... args,
+        const source_location& location = source_location::current()) {
+        if (cat_logger)
+            cat_logger->log(detail::spdlog_sloc(location), level, fmt, std::forward<T>(args)...);
+    }
+    log(const logger_ptr& cat_logger,
+        Level level,
+        const fmt::text_style& sty,
+        fmt::format_string<T...> fmt,
+        T&&... args,
+        const source_location& location = source_location::current()) {
+        if (cat_logger)
+            cat_logger->log(
+                    detail::spdlog_sloc(location),
+                    level,
+                    "{}",
+                    detail::text_style_wrapper<T...>{sty, fmt, args...});
+    }
+};
+
 // Deduction guides for our logging function-like structs; these force all arguments given in the
 // constructor to become explicit `T` constructor arguments, which in turn forces the
 // source_location constructor argument to always get defaulted, which is what we want.  (This
@@ -239,6 +264,15 @@ critical(
         const fmt::text_style& sty,
         fmt::format_string<T...> fmt,
         T&&... args) -> critical<T...>;
+
+template <typename... T>
+log(const logger_ptr& cat, Level level, fmt::format_string<T...> fmt, T&&... args) -> log<T...>;
+template <typename... T>
+log(const logger_ptr& cat,
+    Level level,
+    const fmt::text_style& sty,
+    fmt::format_string<T...> fmt,
+    T&&... args) -> log<T...>;
 
 /// Resets the log level of all existing category loggers, and sets a new default for any created
 /// after this call.  If this has not been called, the default log level of category loggers is
