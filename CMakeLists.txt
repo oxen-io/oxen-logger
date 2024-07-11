@@ -91,7 +91,10 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL GNU AND CMAKE_CXX_COMPILER_VERSION VERSION_GRE
 endif()
 
 add_library(oxen-logging-warnings INTERFACE)
-target_compile_options(oxen-logging-warnings INTERFACE "$<$<OR:$<COMPILE_LANGUAGE:CXX>,$<COMPILE_LANGUAGE:C>>:${warning_flags}>")
+
+if(NOT MSVC)
+    target_compile_options(oxen-logging-warnings INTERFACE "$<$<OR:$<COMPILE_LANGUAGE:CXX>,$<COMPILE_LANGUAGE:C>>:${warning_flags}>")
+endif()
 target_link_libraries(oxen-logging INTERFACE oxen-logging-warnings)
 
 set(oxen_logging_source_roots "" CACHE INTERNAL "")
