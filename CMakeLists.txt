@@ -95,7 +95,7 @@ add_library(oxen-logging-warnings INTERFACE)
 if(NOT MSVC)
     target_compile_options(oxen-logging-warnings INTERFACE "$<$<OR:$<COMPILE_LANGUAGE:CXX>,$<COMPILE_LANGUAGE:C>>:${warning_flags}>")
 endif()
-target_link_libraries(oxen-logging INTERFACE oxen-logging-warnings)
+target_link_libraries(oxen-logging PRIVATE oxen-logging-warnings)
 
 set(oxen_logging_source_roots "" CACHE INTERNAL "")
 target_compile_definitions(oxen-logging PUBLIC OXEN_LOGGING_SOURCE_ROOTS= OXEN_LOGGING_SOURCE_ROOTS_LEN=0)
