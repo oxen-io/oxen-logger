@@ -117,10 +117,11 @@ category logger log levels untouched.
 Generally you should set these using `set(OXEN_LOGGING_WHATEVER somevalue CACHE INTERNAL "")` before
 adding the oxen-logging subdirectory in your cmake parent project.
 
-### `OXEN_LOGGING_SOURCE_ROOT`
+### `oxen_logging_add_source_dir("${PROJECT_SOURCE_DIR}")`
 
-If set to the root path of your source files then that path will be stripped from the filename
-source locations that get logged.
+This function is provided to add a path to the path prefix to strip from the source filename in log
+messages.  It can be called multiple times with different paths (paths given in later calls to this
+are stripped before paths from earlier calls).
 
 ### fmt::fmt, spdlog::spdlog
 
