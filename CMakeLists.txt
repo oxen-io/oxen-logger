@@ -4,7 +4,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15 CACHE STRING "macOS deployment target (Apple clang only)")
 
-project(oxen-logging VERSION 1.0.3 LANGUAGES CXX)
+project(oxen-logging VERSION 1.1.0 LANGUAGES CXX)
 
 option(OXEN_LOGGING_WARNINGS_AS_ERRORS "treat all warnings as errors. turn off for development, on for release" OFF)
 option(OXEN_LOGGING_FORCE_SUBMODULES "Force use of the bundled fmt/spdlog rather than looking for system packages" OFF)
@@ -97,30 +97,12 @@ if(NOT MSVC)
 endif()
 target_link_libraries(oxen-logging PRIVATE oxen-logging-warnings)
 
-set(oxen_logging_source_roots "" CACHE INTERNAL "")
-target_compile_definitions(oxen-logging PUBLIC OXEN_LOGGING_SOURCE_ROOTS= OXEN_LOGGING_SOURCE_ROOTS_LEN=0)
-
-# Prepend a source path to the source roots to be stripped from log statements.  The given path is
-# added *first* in the list of paths, and any existing duplicates are removed (so calling it
-# multiple times will not add it multiple times, but *will* shift it to the front of the list).
+# This used to add a path prefix to be stripped out of log statements, but we now just strip all
+# paths (only keeping the path basename) because the prefix stripping could cause ODR violations
+# when linking multiple oxen-logging-using libraries together, and didn't seem worth fixing via
+# runtime configuration versus just ignoring all directories.
 function(oxen_logging_add_source_dir path)
-    string(REGEX REPLACE "([\\\"])" "\\\\\\1" path_escaped "${path}")
-    list(PREPEND oxen_logging_source_roots "\"${path_escaped}\"")
-    list(REMOVE_DUPLICATES oxen_logging_source_roots)
-    set(oxen_logging_source_roots "${oxen_logging_source_roots}" CACHE INTERNAL "" FORCE)
-
-    foreach(prop_c_d COMPILE_DEFINITIONS INTERFACE_COMPILE_DEFINITIONS)
-        get_target_property(roots oxen-logging ${prop_c_d})
-        list(FILTER roots EXCLUDE REGEX "^OXEN_LOGGING_SOURCE_ROOTS")
-        set_target_properties(oxen-logging PROPERTIES ${prop_c_d} "${root}")
-    endforeach()
-    list(LENGTH oxen_logging_source_roots pathlen)
-    list(JOIN oxen_logging_source_roots ", " paths)
-    target_compile_definitions(oxen-logging PUBLIC
-        OXEN_LOGGING_SOURCE_ROOTS=${paths}
-        OXEN_LOGGING_SOURCE_ROOTS_LEN=${pathlen}
-    )
-    message(STATUS "Stripping source root ${path} from oxen-logging paths")
+    message(WARNING "oxen_logging_add_source_dir is deprecated and does nothing: oxen-logging now strips away all directory names")
 endfunction()
 
 if (OXEN_LOGGING_RELEASE_TRACE)

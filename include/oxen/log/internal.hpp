@@ -44,28 +44,10 @@ spdlog::sink_ptr make_sink(Type type, const std::string& file);
 
 bool is_ansicolor_sink(const spdlog::sink_ptr& sink);
 
-#ifndef OXEN_LOGGING_SOURCE_ROOTS_LEN
-#define OXEN_LOGGING_SOURCE_ROOTS_LEN 0
-#endif
-
-inline constexpr std::array<std::string_view, OXEN_LOGGING_SOURCE_ROOTS_LEN> source_prefixes = {
-#ifdef OXEN_LOGGING_SOURCE_ROOTS
-        OXEN_LOGGING_SOURCE_ROOTS
-#endif
-};
-
 inline auto spdlog_sloc(const source_location& loc) {
     std::string_view filename{loc.file_name()};
-    for (const auto& prefix : source_prefixes) {
-        if (filename.starts_with(prefix)) {
-            filename.remove_prefix(prefix.size());
-            if (!filename.empty() && filename[0] == '/')
-                filename.remove_prefix(1);
-        }
-    }
-    while (filename.starts_with("../"))
-        filename.remove_prefix(3);
-
+    if (auto pos = filename.rfind('/'); pos != std::string_view::npos)
+        filename.remove_prefix(pos + 1);
     return spdlog::source_loc{filename.data(), static_cast<int>(loc.line()), loc.function_name()};
 }
 
