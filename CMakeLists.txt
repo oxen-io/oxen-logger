@@ -11,6 +11,8 @@ option(OXEN_LOGGING_FORCE_SUBMODULES "Force use of the bundled fmt/spdlog rather
 option(OXEN_LOGGING_RELEASE_TRACE "Enable trace logging in release builds" OFF)
 option(OXEN_LOGGING_FMT_HEADER_ONLY "Use fmt in header-only mode" OFF)
 option(OXEN_LOGGING_SPDLOG_HEADER_ONLY "Use spdlog in header-only mode" OFF)
+option(BUILD_SHARED_LIBS "Build a shared library instead of static library" OFF)
+option(OXEN_LOGGING_VERSION_SO "Add the project major/minor version into the shared library filename" OFF)
 
 if(NOT OXEN_LOGGING_FORCE_SUBMODULES)
     if(NOT TARGET fmt::fmt)
@@ -68,12 +70,16 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_library(oxen-logging STATIC
+add_library(oxen-logging
     src/catlogger.cpp
     src/level.cpp
     src/log.cpp
     src/type.cpp
 )
+
+if(OXEN_LOGGING_VERSION_SO)
+    set_target_properties(oxen-logging PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
+endif()
 
 target_include_directories(oxen-logging PUBLIC include)
 target_link_libraries(oxen-logging PUBLIC ${OXEN_LOGGING_FMT_TARGET} ${OXEN_LOGGING_SPDLOG_TARGET})
