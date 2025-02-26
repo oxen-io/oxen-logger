@@ -1,0 +1,33 @@
+Source: oxen-logging
+Priority: optional
+Maintainer: Jason Rhinelander <jason@session.foundation>
+Build-Depends:
+    debhelper-compat (= 11),
+    cmake (>= 3.14),
+    libfmt-dev (>= 9),
+    libspdlog-dev (>= 1.9.1),
+    g++
+Standards-Version: 4.4.1
+Section: libs
+Homepage: https://github.com/oxen-io/oxen-logging
+
+Package: liboxen-logging-dev
+Section: libdevel
+Architecture: any
+Depends: liboxen-logging@LIB_VERSION@ (= ${binary:Version}), ${misc:Depends}
+Description: spdlog-based logging library (headers)
+ This C++20 library contains wrappers around fmt and spdlog to provide
+ easy-to-use logging facilities.
+ .
+ This package contains the library headers and other development files needed
+ to build software using oxen-logging.
+
+Package: liboxen-logging@LIB_VERSION@
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: spdlog-based logging library
+ This C++20 library contains wrappers around fmt and spdlog to provide
+ easy-to-use logging facilities.
+ .
+ This package contains the library file needed by software built using
+ oxen-logging.

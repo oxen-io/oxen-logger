@@ -1,0 +1,13 @@
+#!/usr/bin/make -f
+# See debhelper(7) (uncomment to enable)
+# output every command that modifies files on the build system.
+#export DH_VERBOSE = 1
+
+include /usr/share/dpkg/pkg-info.mk
+
+%:
+	debian/gen-liboxen-logging-install.sh $(DEB_VERSION_UPSTREAM)
+	dh $@ --buildsystem=cmake --parallel
+
+override_dh_auto_configure:
+	dh_auto_configure -- -DBUILD_SHARED_LIBS=ON -DOXEN_LOGGING_VERSION_SO=ON
