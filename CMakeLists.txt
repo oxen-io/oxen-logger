@@ -14,6 +14,46 @@ option(OXEN_LOGGING_SPDLOG_HEADER_ONLY "Use spdlog in header-only mode" OFF)
 option(BUILD_SHARED_LIBS "Build a shared library instead of static library" OFF)
 option(OXEN_LOGGING_VERSION_SO "Add the project major/minor version into the shared library filename" OFF)
 
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    set(oxen_logging_IS_TOPLEVEL_PROJECT TRUE)
+else()
+    set(oxen_logging_IS_TOPLEVEL_PROJECT FALSE)
+endif()
+
+if(BUILD_SHARED_LIBS OR oxen_logging_IS_TOPLEVEL_PROJECT)
+    set(install_default ON)
+else()
+    set(install_default OFF)
+endif()
+option(OXEN_LOGGING_INSTALL "Install oxen-logging library and headers to cmake install target; defaults to ON if BUILD_SHARED_LIBS is enabled or when building as the top-level project" ${install_default})
+
+if(MINGW OR ANDROID OR IOS)
+  set(use_lto_default OFF)
+else()
+  set(use_lto_default ON)
+endif()
+option(USE_LTO "Use Link-Time Optimization" ${use_lto_default})
+
+if(USE_LTO)
+  include(CheckIPOSupported)
+  check_ipo_supported(RESULT IPO_ENABLED OUTPUT ipo_error)
+  if(IPO_ENABLED)
+    message(STATUS "LTO enabled")
+  else()
+    message(WARNING "LTO not supported by compiler: ${ipo_error}")
+  endif()
+else()
+  message(STATUS "LTO disabled")
+  set(IPO_ENABLED OFF)
+endif()
+
+if(IPO_ENABLED AND NOT DEFINED CMAKE_INTERPROCEDURAL_OPTIMIZATION)
+  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
+endif()
+
+# Always build PIC
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 if(NOT OXEN_LOGGING_FORCE_SUBMODULES)
     if(NOT TARGET fmt::fmt)
         find_package(fmt 9.0.0 CONFIG QUIET)
@@ -116,3 +156,21 @@ if (OXEN_LOGGING_RELEASE_TRACE)
 endif()
 
 add_library(oxen::logging ALIAS oxen-logging)
+
+if(OXEN_LOGGING_INSTALL)
+    include(GNUInstallDirs)
+
+    install(
+        TARGETS oxen-logging
+        EXPORT oxenloggingConfig
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
+
+    install(DIRECTORY include/oxen DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} PATTERN *.hpp)
+
+    configure_file(liboxen-logging.pc.in liboxen-logging.pc @ONLY)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/liboxen-logging.pc
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+    )
+
+endif()
