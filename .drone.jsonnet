@@ -1,6 +1,6 @@
-local distro = 'sid';
+local distro = 'oracular';
 local distro_name = 'Debian ' + distro;
-local distro_docker = 'registry.oxen.rocks/debian-' + distro + '-builder';
+local distro_docker = 'registry.oxen.rocks/ubuntu-' + distro + '-builder';
 
 local apt_get_quiet = 'apt-get -o=Dpkg::Use-Pty=0 -q';
 
