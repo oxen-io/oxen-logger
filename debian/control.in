@@ -4,7 +4,7 @@ Maintainer: Jason Rhinelander <jason@session.foundation>
 Build-Depends:
     debhelper-compat (= 11),
     cmake (>= 3.14),
-    g++
+    g++-10
 Standards-Version: 4.4.1
 Section: libs
 Homepage: https://github.com/oxen-io/oxen-logging
