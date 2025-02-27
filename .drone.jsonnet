@@ -111,6 +111,7 @@ local windows_cross_pipeline(name,
                              werror=false,
                              cmake_extra='',
                              local_mirror=true,
+                             cmake_extra='',
                              extra_cmds=[],
                              jobs=6,
                              tests=false,
@@ -139,7 +140,8 @@ local windows_cross_pipeline(name,
         '-DCMAKE_COLOR_DIAGNOSTICS=ON -DCMAKE_BUILD_TYPE=' + build_type + ' ' +
         (if werror then '-DOXEN_LOGGING_WARNINGS_AS_ERRORS=ON ' else '') +
         '-DWITH_LTO=' + (if lto then 'ON ' else 'OFF ') +
-        ci_dep_mirror(local_mirror),
+        ci_dep_mirror(local_mirror) +
+        cmake_extra,
         'make -j' + jobs + ' VERBOSE=1',
         //'wine-stable tests/alltests.exe --log-level debug --colour-mode ansi', // doesn't work yet :(
       ] + extra_cmds,
@@ -270,7 +272,11 @@ local mac_builder(name,
   debian_pipeline('Debian 11 bullseye', docker_base + 'debian-bullseye', deps=default_deps, extra_setup=debian_backports('bullseye', ['cmake'])),
   debian_pipeline('Ubuntu latest', docker_base + 'ubuntu-rolling'),
   debian_pipeline('Ubuntu 22.04 jammy', docker_base + 'ubuntu-jammy'),
-  debian_pipeline('Ubuntu 20.04 focal', docker_base + 'ubuntu-focal', deps=default_deps, extra_setup=kitware_repo('focal')),
+  debian_pipeline('Ubuntu 20.04 focal',
+                  docker_base + 'ubuntu-focal',
+                  deps=['g++-10'] + default_deps_base,
+                  extra_setup=kitware_repo('focal'),
+                  cmake_extra='-DCMAKE_C_COMPILER=gcc-10 -DCMAKE_CXX_COMPILER=g++-10'),
 
   // ARM builds (ARM64 and armhf)
   debian_pipeline('Debian sid (ARM64)', docker_base + 'debian-sid', arch='arm64', jobs=4),

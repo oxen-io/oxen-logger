@@ -37,17 +37,9 @@
 
 #include <fmt/core.h>
 
-#ifdef _MSVC_LANG
-#define OXEN_LOGGING_CPLUSPLUS _MSVC_LANG
-#else
-#define OXEN_LOGGING_CPLUSPLUS __cplusplus
-#endif
-
 namespace oxen::log {
 
 namespace detail {
-
-#if OXEN_LOGGING_CPLUSPLUS >= 202002L
 
     template <size_t N>
     struct string_literal {
@@ -83,48 +75,10 @@ namespace detail {
         }
     };
 
-#else  // Not C++20:
-
-    // Internal implementation of _format that holds the format temporarily until the (...) operator
-    // is invoked on it.  This object cannot be moved, copied but only used ephemerally in-place.
-    struct fmt_wrapper17 {
-      protected:
-        std::string_view format;
-
-        // Non-copyable and non-movable:
-        fmt_wrapper17(const fmt_wrapper17&) = delete;
-        fmt_wrapper17& operator=(const fmt_wrapper17&) = delete;
-        fmt_wrapper17(fmt_wrapper17&&) = delete;
-        fmt_wrapper17& operator=(fmt_wrapper17&&) = delete;
-
-      public:
-        constexpr explicit fmt_wrapper17(const char* str, const std::size_t len) :
-                format{str, len} {}
-
-        /// Calling on this object forwards all the values to fmt::format, using the format string
-        /// as provided during construction (via the "..."_format user-defined function).
-        template <typename... T>
-        auto operator()(T&&... args) && {
-            return fmt::format(format, std::forward<T>(args)...);
-        }
-    };
-
-    struct fmt_append_wrapper17 : fmt_wrapper17 {
-        using fmt_wrapper17::fmt_wrapper17;
-
-        template <typename String, typename... T>
-        auto operator()(String& s, T&&... args) && {
-            return fmt::format_to(std::back_inserter(s), format, std::forward<T>(args)...);
-        }
-    };
-
-#endif
-
 }  // namespace detail
 
 inline namespace literals {
 
-#if OXEN_LOGGING_CPLUSPLUS >= 202002L
     template <detail::string_literal Format>
     inline consteval auto operator""_format() {
         return detail::fmt_wrapper<Format>{};
@@ -134,15 +88,6 @@ inline namespace literals {
     inline consteval auto operator""_format_to() {
         return detail::fmt_append_wrapper<Format>{};
     }
-#else
-    inline detail::fmt_wrapper17 operator""_format(const char* str, size_t len) {
-        return detail::fmt_wrapper17{str, len};
-    }
-
-    inline detail::fmt_append_wrapper17 operator""_format_to(const char* str, size_t len) {
-        return detail::fmt_append_wrapper17{str, len};
-    }
-#endif
 
 }  // namespace literals
 
