@@ -10,4 +10,5 @@ include /usr/share/dpkg/pkg-info.mk
 	dh $@ --buildsystem=cmake --parallel
 
 override_dh_auto_configure:
-	dh_auto_configure -- -DBUILD_SHARED_LIBS=ON -DOXEN_LOGGING_VERSION_SO=ON
+	dh_auto_configure -- -DBUILD_SHARED_LIBS=ON -DOXEN_LOGGING_VERSION_SO=ON \
+		-DOXEN_LOGGING_FMT_HEADER_ONLY=ON

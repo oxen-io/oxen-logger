@@ -4,8 +4,6 @@ Maintainer: Jason Rhinelander <jason@session.foundation>
 Build-Depends:
     debhelper-compat (= 11),
     cmake (>= 3.14),
-    libfmt-dev (>= 9),
-    libspdlog-dev (>= 1.9.1),
     g++
 Standards-Version: 4.4.1
 Section: libs
