@@ -1,3 +1,14 @@
+oxen-logging (1.1.0-2~ubuntu2004) focal; urgency=medium
+
+  * fix fmt11 compatibility
+  * remove too-old system fmt/spdlog dep
+  * drop ubuntu i386 build
+  * use fmt/spdlog in header-only mode, part 2
+  * focal: use g++-10
+  * fix load_fmt_spdlog invocation from parent project
+
+ -- Jason Rhinelander <jason@session.foundation>  Thu, 27 Feb 2025 20:22:24 -0400
+
 oxen-logging (1.1.0-1~ubuntu2004) focal; urgency=medium
 
   * Initial release.
