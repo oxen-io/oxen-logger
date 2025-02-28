@@ -1,3 +1,13 @@
+oxen-logging (1.1.0-2~deb11) bullseye; urgency=medium
+
+  * fix fmt11 compatibility
+  * remove too-old system fmt/spdlog dep
+  * use fmt/spdlog in header-only mode
+  * use fmt/spdlog in header-only mode, part 2
+  * fix load_fmt_spdlog invocation from parent project
+
+ -- Jason Rhinelander <jason@session.foundation>  Thu, 27 Feb 2025 20:22:12 -0400
+
 oxen-logging (1.1.0-1~bullseye) bullseye; urgency=medium
 
   * Initial release.
