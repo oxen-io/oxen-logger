@@ -1,3 +1,12 @@
+oxen-logging (1.1.0-2~ubuntu2410) oracular; urgency=medium
+
+  * fix fmt11 compatibility
+  * drop ubuntu i386 build
+  * drop unsupported arm32 from oracular
+  * fix load_fmt_spdlog invocation from parent project
+
+ -- Jason Rhinelander <jason@session.foundation>  Thu, 27 Feb 2025 20:22:15 -0400
+
 oxen-logging (1.1.0-1~ubuntu2410) oracular; urgency=medium
 
   * Initial release.
