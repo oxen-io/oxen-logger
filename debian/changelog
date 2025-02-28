@@ -1,3 +1,10 @@
+oxen-logging (1.1.0-2~deb12) bookworm; urgency=medium
+
+  * fix fmt11 compatibility
+  * fix load_fmt_spdlog invocation from parent project
+
+ -- Jason Rhinelander <jason@session.foundation>  Thu, 27 Feb 2025 20:22:09 -0400
+
 oxen-logging (1.1.0-1~deb12) bookworm; urgency=medium
 
   * Initial release.
