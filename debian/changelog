@@ -1,3 +1,12 @@
+oxen-logging (1.1.0-2~ubuntu2404) noble; urgency=medium
+
+  * fix fmt11 compatibility
+  * drop ubuntu i386 build
+  * armhf not supported on noble
+  * fix load_fmt_spdlog invocation from parent project
+
+ -- Jason Rhinelander <jason@session.foundation>  Thu, 27 Feb 2025 20:22:18 -0400
+
 oxen-logging (1.1.0-1~ubuntu2404) noble; urgency=medium
 
   * Initial release.
